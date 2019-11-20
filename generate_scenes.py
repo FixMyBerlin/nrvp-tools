@@ -7,18 +7,20 @@ import sys
 import random
 import rules_hvs
 import rules_sr
+import json
 from PIL import Image, ImageOps
 from collections import defaultdict
 from pprint import pprint
 
 IMAGE_SIZE = (1240, 930)
 IGNORE = (".DS_Store", "Icon\r")
-SAVE_IMAGES = True
+SAVE_IMAGES = False
 
 layers_used = set()
 missing_base = set()
 layer_ids = set()
 layersets = defaultdict(list)
+all_layer_names = set()
 
 csv.field_size_limit(sys.maxsize)
 
@@ -65,6 +67,8 @@ def make_images(experiment, base, perspective, rows):
     except FileNotFoundError as e:
         return
 
+    all_layer_names.update(layer_names)
+
     handles = {}
     for lname in layer_names:
         try:
@@ -104,7 +108,7 @@ def make_images(experiment, base, perspective, rows):
         lset = frozenset(layers)
         # if lset in layersets:
         #     print(f"Layerset for Scene {row['SceneID']} already used in Scene {layersets[lset]}\n{lset}")
-        layersets[lset].append(row["SceneID"])
+        layersets[lset].append(row)
         if SAVE_IMAGES:
             save_composite_image(layers, handles, row["SceneID"])
 
@@ -147,12 +151,15 @@ def main():
     ]
     if len(duplicate_layer_sets) > 0:
         print(f"Duplicate layersets: {len(duplicate_layer_sets)}")
-        for lset in duplicate_layer_sets:
-            print(f"Layerset: {lset}")
-            print(f"Scenes: {', '.join(layersets[lset])}\n")
+        with open("duplicate_layersets.txt", "w") as f:
+            for lset in duplicate_layer_sets:
+                f.write(f"Layerset: {', '.join(lset)}\n")
+                for scene in layersets[lset]:
+                    f.write(json.dumps(scene, indent=2))
+                f.write("\n\n")
 
     print(
-        "Unused: {}".format(", ".join([l for l in layer_names if l not in layers_used]))
+        "Unused:\n- {}".format("\n- ".join([l for l in all_layer_names if l not in layers_used]))
     )
 
 
