@@ -23,61 +23,69 @@ def needs_layer(data, lname, experiment):
     if experiment != layer_experiment:
         return False
 
+    if lname.endswith("Basis.png"):
+        return True
+
     # Aufpflasterung
-    if "TrLi_Aufpflasterung" in lname and "Breit" in lname:
+    if "TrLi-Aufpflasterung-Breit" in lname:
         rv = data["Tr_li-Breite"] == "breit" and data["Tr_li-Art"] == "Aufpflasterung"
         return rv
     
-    if "TrLi_Aufpflasterung" in lname and "Schmal" in lname:
+    if "TrLi-Aufpflasterung-Schmal" in lname:
         rv = (data["Tr_li-Breite"] == "schmal" and data["Tr_li-Art"] == "Aufpflasterung")
         return rv
     
-    if "TrRe_Aufpflasterung" in lname and "Breit" in lname:
+    if "TrRe-Aufpflasterung-Breit" in lname:
         rv = data["Tr_re-Breite"] == "breit" and data["Tr_re-Art"] == "Aufpflasterung"
         return rv
     
-    if "TrRe_Aufpflasterung" in lname and "Schmal" in lname:
+    if lname.endswith("Aufpflasterung-Schmal.png"):
         rv = data["Tr_re-Breite"] == "schmal" and data["Tr_re-Art"] == "Aufpflasterung"
+        return rv
+
+    if "Aufpflasterung-Schmal-Hecke" in lname:
+        rv = data["Tr_re-Breite"] == "schmal" and data["Tr_re-Art"] == "Aufpflasterung"
+        rv = rv and data["Haeuserfront"] == "Gruenanlage"
         return rv
 
     # Grünfläche und Grasfläche
 
-    if "TrLi_Gruenstreifen" in lname and "Breit" in lname:
+    if "TrLi-Gruenstreifen-Breit" in lname:
         rv = data["Tr_li-Breite"] == "breit" and data["Tr_li-Art"] == "Gruenstreifen"
         return rv
     
-    if "TrLi_Gruenstreifen" in lname and "Schmal" in lname:
+    if "TrLi-Gruenstreifen-Schmal" in lname:
         rv = data["Tr_li-Breite"] == "schmal" and data["Tr_li-Art"] == "Gruenstreifen"
         return rv
     
-    if "TrRe_Gruenstreifen" in lname and "Breit" in lname:
+    if "TrRe-Gruenstreifen-Breit" in lname:
         rv = data["Tr_re-Breite"] == "breit" and data["Tr_re-Art"] == "Gruenstreifen"
         return rv
     
-    if "TrRe_Gruenstreifen" in lname and "Schmal" in lname:
+    if "TrRe-Gruenstreifen-Schmal" in lname:
         rv = data["Tr_re-Breite"] == "schmal" and data["Tr_re-Art"] == "Gruenstreifen"
         return rv
 
     # Hecke
 
-    if "TrLi_Hecke" in lname:
+    if "TrLi-Hecke" in lname:
         rv = data["Links_RVA"] == "Gruenanlage"
         return rv
 
-    if data["SceneID"].endswith("A_258"):
-        print(lname)
-
-    if "TrRe_Hecke" in lname:
-        # print(lname, data["Haeuserfront"])
+    if "TrRe-Hecke" in lname:
         rv = data["Haeuserfront"] == "Gruenanlage"
-        if rv:
-            print(data["SceneID"])
         return rv
-
-
 
     # Poller
 
+    if "Poller"  in lname:
+        rv = data["Tr_li_baulTrennung"] == "Sperrpfosten"
+        return rv
+
     # Auslage
+
+    if "Auslage" in lname:
+        rv = data["GW-Geschaeftsnutzung"] == "ja"
+        return rv
 
     return False
