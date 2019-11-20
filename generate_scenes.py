@@ -1,13 +1,19 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+ 
 import csv
 import os
 import sys
 import random
+import rules_hvs
+import rules_sr
 from PIL import Image, ImageOps
 from collections import defaultdict
 from pprint import pprint
 
 IMAGE_SIZE = (1240, 930)
 IGNORE = (".DS_Store", "Icon\r")
+SAVE_IMAGES = False
 
 layers_used = set()
 missing_base = set()
@@ -34,70 +40,6 @@ def save_composite_image(layers, handles, sceneID):
     new_fname = os.path.join("./out", sceneID + ".jpg")
     image_cropped = ImageOps.fit(image, IMAGE_SIZE, centering=(0.5, 0.5))
     image_cropped.save(new_fname, quality=60)
-
-
-def needs_layer(data, lname):
-    if lname.endswith("Basis.png"):
-        return True
-
-    if "Trli-baulTrennung-Sperrpfosten_hoch" in lname:
-        return data["Tr_li-baulTrennung"] == "Sperrpfosten_hoch"
-
-    if "Trli-baulTrennung-Sperrpfosten-niedrig" in lname:
-        return data["Tr_li-baulTrennung"] == "Sperrpfosten_niedrig"
-
-    if "FS-Aufkommen-hoch" in lname:
-        return data["FS-Aufkommen"] == "hoch"
-
-    if "Trli-Breit-Pflanzenbeete" in lname:
-        return data["Tr_li-baulTrennung"] == "Blumenkasten"
-
-    if "TrRe__SchmalDurchgezogen" in lname:
-        return False
-
-    if "Tempo30" in lname:
-        return data["FS-Geschwindigkeit"] == "30"
-
-    if "Tempo50" in lname:
-        return data["FS-Geschwindigkeit"] == "50"
-
-    if "Trli-Schmal-unterbrochen" in lname:
-        return data["Tr_li-Markierung"] == "unterbrochen"
-
-    if "Trli-Schmal-durchgezogen" in lname:
-        return data["Tr_li-Markierung"] == "durchgezogen"
-
-    if "Trli-Breit-Doppellinie" in lname:
-        return data["Tr_li-Markierung"] == "Doppellinie"
-
-    if "Trli-Breit-schraffiert" in lname:
-        return data["Tr_li-Markierung"] == "Schraffiert"
-
-    if "RVA-Farbig-Schraffur" in lname:
-        return data["RVA-Oberfläche"] == "Asphalt - farbig Schraffur"
-
-    if "RVA-Farbig_ganz" in lname:
-        return (
-            data["RVA-Oberfläche"] == "Asphalt - farbig"
-            and data["Tr_li-Breite"] == "schmal"
-        )
-
-    if "RVA-Farbig_abgeschnitten" in lname:
-        return (
-            data["RVA-Oberfläche"] == "Asphalt - farbig"
-            and data["Tr_li-Breite"] == "breit"
-        )
-
-    if "Einbahnstraße" in lname:
-        return data["FS-Art"] == "Einbahn"
-
-    if "Tram" in lname:
-        return data["FS-Art"] == "Tram"
-
-    if "Lenker" in lname:
-        return data["Kamera"] == "C"
-
-    return False
 
 
 def get_layer_names(experiment, base, perspective):
@@ -131,16 +73,28 @@ def make_images(experiment, base, perspective, rows):
             print("Error loading layer", e)
             sys.exit()
 
+    if experiment == "SR":
+        needs_layer = rules_sr.needs_layer
+    elif experiment == "HVS":
+        needs_layer = rules_hvs.needs_layer
+
+
     for i, row in enumerate(rows):
-        if (i + 1) % 25 == 0:
-            print("{} / {}: {}".format(i + 1, total, row["SceneID"]))
-        # pprint(row)
         layers = sorted(
-            [lname for lname in layer_names if needs_layer(row, lname)], reverse=True
+            [lname for lname in layer_names if needs_layer(row, lname, experiment)], reverse=True
         )
 
-        if len(layers) == 0:
-            return
+        print("{} / {}: {}".format(i + 1, total, row["SceneID"]))
+        pprint(row)
+        print("Layers:")
+        for lname in sorted(layer_names):
+            print(needs_layer(row, lname, experiment), lname)
+        
+        if i >= 0:
+            import pdb; pdb.set_trace()
+
+        # if len(layers) == 0:
+        #     continue
 
         for layer in layers:
             layers_used.add(layer)
@@ -149,14 +103,15 @@ def make_images(experiment, base, perspective, rows):
         # if lset in layersets:
         #     print(f"Layerset for Scene {row['SceneID']} already used in Scene {layersets[lset]}\n{lset}")
         layersets[lset].append(row["SceneID"])
-        save_composite_image(layers, handles, row["SceneID"])
+        if SAVE_IMAGES:
+            save_composite_image(layers, handles, row["SceneID"])
 
     for lname in layer_names:
         handles[lname].close()
 
 
 def main():
-    experiments = ["HVS", "SR"]
+    experiments = ["SR"]
     for experiment in experiments:
         with open("Szenarienübersicht_{}.csv".format(experiment)) as f:
             csv_reader = csv.DictReader(f, delimiter=",")
@@ -168,17 +123,19 @@ def main():
 
         for base in scenes_grouped.keys():
             for perspective in scenes_grouped[base].keys():
-                print(
-                    "\n{}\tSzenen für Experiment {}\tBasisszenario {}\tPerspektive {}".format(
-                        len(scenes_grouped[base][perspective]),
-                        experiment,
-                        base,
-                        perspective,
+                if base == "01" and perspective == "C":
+                    print(
+                        "\n{}\tSzenen für Experiment {}\tBasisszenario {}\tPerspektive {}".format(
+                            len(scenes_grouped[base][perspective]),
+                            experiment,
+                            base,
+                            perspective,
+                        )
                     )
-                )
-                make_images(
-                    experiment, base, perspective, scenes_grouped[base][perspective]
-                )
+
+                    make_images(
+                        experiment, base, perspective, scenes_grouped[base][perspective]
+                    )
 
     print("All layer ids:")
     pprint(sorted(layer_ids))
@@ -189,9 +146,9 @@ def main():
     ]
     if len(duplicate_layer_sets) > 0:
         print(f"Duplicate layersets: {len(duplicate_layer_sets)}")
-        # for lset in duplicate_layer_sets:
-        #     print(f"Layerset: {lset}")
-        #     print(f"Scenes: {', '.join(layersets[lset])}\n")
+        for lset in duplicate_layer_sets:
+            print(f"Layerset: {lset}")
+            print(f"Scenes: {', '.join(layersets[lset])}\n")
 
     # print(
     #     "Unused: {}".format(", ".join([l for l in layer_names if l not in layers_used]))
