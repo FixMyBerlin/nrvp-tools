@@ -26,6 +26,12 @@ def needs_layer(data, lname, experiment):
     if lname.endswith("Basis.png"):
         return True
 
+    if "Konsole" in lname:
+        return data["Kamera"] == "A"
+
+    if "Lenker" in lname:
+        return data["Kamera"] == "C"
+
     # Aufpflasterung
     if "TrLi-Aufpflasterung-Breit" in lname:
         rv = data["Tr_li-Breite"] == "breit" and data["Tr_li-Art"] == "Aufpflasterung"
