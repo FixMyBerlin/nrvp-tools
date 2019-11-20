@@ -13,7 +13,7 @@ from pprint import pprint
 
 IMAGE_SIZE = (1240, 930)
 IGNORE = (".DS_Store", "Icon\r")
-SAVE_IMAGES = False
+SAVE_IMAGES = True
 
 layers_used = set()
 missing_base = set()
@@ -84,14 +84,16 @@ def make_images(experiment, base, perspective, rows):
             [lname for lname in layer_names if needs_layer(row, lname, experiment)], reverse=True
         )
 
-        print("{} / {}: {}".format(i + 1, total, row["SceneID"]))
-        pprint(row)
-        print("Layers:")
-        for lname in sorted(layer_names):
-            print(needs_layer(row, lname, experiment), lname)
+        if i % 25 == 0:
+            print("{} / {}: {}".format(i + 1, total, row["SceneID"]))
+        # pprint(row)
+        # print("Layers:")
+        # for lname in sorted(layer_names):
+        #     head = "--> " if needs_layer(row, lname, experiment) else "    "
+        #     print(head, lname)
         
-        if i >= 0:
-            import pdb; pdb.set_trace()
+        # if i >= 110:
+        #     import pdb; pdb.set_trace()
 
         # if len(layers) == 0:
         #     continue
@@ -123,26 +125,25 @@ def main():
 
         for base in scenes_grouped.keys():
             for perspective in scenes_grouped[base].keys():
-                if base == "01" and perspective == "C":
-                    print(
-                        "\n{}\tSzenen für Experiment {}\tBasisszenario {}\tPerspektive {}".format(
-                            len(scenes_grouped[base][perspective]),
-                            experiment,
-                            base,
-                            perspective,
-                        )
+                print(
+                    "\n{}\tSzenen für Experiment {}\tBasisszenario {}\tPerspektive {}".format(
+                        len(scenes_grouped[base][perspective]),
+                        experiment,
+                        base,
+                        perspective,
                     )
+                )
 
-                    make_images(
-                        experiment, base, perspective, scenes_grouped[base][perspective]
-                    )
+                make_images(
+                    experiment, base, perspective, scenes_grouped[base][perspective]
+                )
 
     print("All layer ids:")
     pprint(sorted(layer_ids))
     print()
 
     duplicate_layer_sets = [
-        lset for lset in layersets.keys() if len(layersets[lset]) > 0
+        lset for lset in layersets.keys() if len(layersets[lset]) > 1
     ]
     if len(duplicate_layer_sets) > 0:
         print(f"Duplicate layersets: {len(duplicate_layer_sets)}")
@@ -150,9 +151,9 @@ def main():
             print(f"Layerset: {lset}")
             print(f"Scenes: {', '.join(layersets[lset])}\n")
 
-    # print(
-    #     "Unused: {}".format(", ".join([l for l in layer_names if l not in layers_used]))
-    # )
+    print(
+        "Unused: {}".format(", ".join([l for l in layer_names if l not in layers_used]))
+    )
 
 
 if __name__ == "__main__":
