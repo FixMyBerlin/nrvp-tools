@@ -34,7 +34,6 @@ def merge_images(images):
         if rv is None:
             rv = image
         else:
-            # rv.paste(image, (0, 0))
             rv = Image.alpha_composite(rv, image)
     return rv.convert("RGB")
 
@@ -60,6 +59,23 @@ def get_layer_names(experiment, base, perspective):
         layer_ids.add(layer.split("_", 5)[-1])
 
     return basepath, layer_names
+
+
+def log_debug_info(iteration, row, total, layer_names):
+    if iteration % 25 == 0:
+        print("{} / {}: {}".format(i + 1, total, row["SceneID"]))
+    elif DEBUG:
+        print("{} / {}: {}".format(i + 1, total, row["SceneID"]))
+        pprint(row)
+        print("Layers:")
+        for lname in sorted(layer_names):
+            head = "--> " if needs_layer(row, lname, experiment) else "    "
+            print(head, lname)
+
+        # if row["Basisszenario"] != "1":
+        import pdb
+
+        pdb.set_trace()
 
 
 def make_images(experiment, base, perspective, rows):
@@ -94,35 +110,30 @@ def make_images(experiment, base, perspective, rows):
             reverse=True,
         )
 
-        if i % 25 == 0:
-            print("{} / {}: {}".format(i + 1, total, row["SceneID"]))
+        log_debug_info(i, row, total, layer_names)
 
-        if DEBUG:
-            print("{} / {}: {}".format(i + 1, total, row["SceneID"]))
-            pprint(row)
-            print("Layers:")
-            for lname in sorted(layer_names):
-                head = "--> " if needs_layer(row, lname, experiment) else "    "
-                print(head, lname)
+        layers_used.update(layers)
+        layersets[frozenset(layers)].append(row)
 
-            # if row["Basisszenario"] != "1":
-            import pdb; pdb.set_trace()
-
-        # if len(layers) == 0:
-        #     continue
-
-        for layer in layers:
-            layers_used.add(layer)
-
-        lset = frozenset(layers)
-        # if lset in layersets:
-        #     print(f"Layerset for Scene {row['SceneID']} already used in Scene {layersets[lset]}\n{lset}")
-        layersets[lset].append(row)
         if SAVE_IMAGES:
             save_composite_image(layers, handles, row["SceneID"])
 
     for lname in layer_names:
         handles[lname].close()
+
+
+def log_duplicate_layersets(fname):
+    duplicate_layer_sets = [
+        lset for lset in layersets.keys() if len(layersets[lset]) > 1
+    ]
+    if len(duplicate_layer_sets) > 0:
+        print(f"Duplicate layersets: {len(duplicate_layer_sets)}")
+        with open(fname, "w") as f:
+            for lset in duplicate_layer_sets:
+                f.write(f"Layerset: {', '.join(lset)}\n")
+                for scene in layersets[lset]:
+                    f.write(json.dumps(scene, indent=2))
+                f.write("\n\n")
 
 
 def main():
@@ -140,35 +151,24 @@ def main():
 
         for base in scenes_grouped.keys():
             for perspective in scenes_grouped[base].keys():
-                if experiment == "SE":
-                    print(
-                        "\n{}\tSzenen für Experiment {}\tBasisszenario {}\tPerspektive {}".format(
-                            len(scenes_grouped[base][perspective]),
-                            experiment,
-                            base,
-                            perspective,
-                        )
+                print(
+                    "\n{}\tSzenen für Experiment {}\tBasisszenario {}\tPerspektive {}".format(
+                        len(scenes_grouped[base][perspective]),
+                        experiment,
+                        base,
+                        perspective,
                     )
+                )
 
-                    make_images(
-                        experiment, base, perspective, scenes_grouped[base][perspective]
-                    )
+                make_images(
+                    experiment, base, perspective, scenes_grouped[base][perspective]
+                )
 
     print("All layer ids:")
     pprint(sorted(layer_ids))
     print()
 
-    duplicate_layer_sets = [
-        lset for lset in layersets.keys() if len(layersets[lset]) > 1
-    ]
-    if len(duplicate_layer_sets) > 0:
-        print(f"Duplicate layersets: {len(duplicate_layer_sets)}")
-        with open("duplicate_layersets.txt", "w") as f:
-            for lset in duplicate_layer_sets:
-                f.write(f"Layerset: {', '.join(lset)}\n")
-                for scene in layersets[lset]:
-                    f.write(json.dumps(scene, indent=2))
-                f.write("\n\n")
+    log_duplicate_layersets("duplicate_layersets.txt")
 
     print(
         "Unused:\n- {}".format(
