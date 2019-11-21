@@ -13,16 +13,18 @@ from PIL import Image, ImageOps
 from collections import defaultdict
 from pprint import pprint
 
-IMAGE_SIZE = (1240, 930)
-IGNORE = (".DS_Store", "Icon\r")
-SAVE_IMAGES = True
 DEBUG = False
+SAVE_IMAGES = True
 
-layers_used = set()
-missing_base = set()
-layer_ids = set()
-layersets = defaultdict(list)
+FNAME_SCENE_LIST = "KatasterKI_scene_list.csv"
+IGNORE = (".DS_Store", "Icon\r")
+IMAGE_SIZE = (1240, 930)
+
 all_layer_names = set()
+layer_ids = set()
+layers_used = set()
+layersets = defaultdict(list)
+missing_base = set()
 
 csv.field_size_limit(sys.maxsize)
 
@@ -63,9 +65,9 @@ def get_layer_names(experiment, base, perspective):
 
 def log_debug_info(iteration, row, total, layer_names):
     if iteration % 25 == 0:
-        print("{} / {}: {}".format(i + 1, total, row["SceneID"]))
+        print("{} / {}: {}".format(iteration + 1, total, row["SceneID"]))
     elif DEBUG:
-        print("{} / {}: {}".format(i + 1, total, row["SceneID"]))
+        print("{} / {}: {}".format(iteration + 1, total, row["SceneID"]))
         pprint(row)
         print("Layers:")
         for lname in sorted(layer_names):
@@ -76,6 +78,30 @@ def log_debug_info(iteration, row, total, layer_names):
         import pdb
 
         pdb.set_trace()
+
+
+def log_duplicate_layersets(fname):
+    duplicate_layer_sets = [
+        lset for lset in layersets.keys() if len(layersets[lset]) > 1
+    ]
+    if len(duplicate_layer_sets) > 0:
+        print(f"Duplicate layersets: {len(duplicate_layer_sets)}")
+        with open(fname, "w") as f:
+            for lset in duplicate_layer_sets:
+                f.write(f"Layerset: {', '.join(lset)}\n")
+                for scene in layersets[lset]:
+                    f.write(json.dumps(scene, indent=2))
+                f.write("\n\n")
+
+
+def reset_scene_list():
+    with open(FNAME_SCENE_LIST, "w") as f:
+        f.write("SceneID,Weight")
+
+
+def append_scene_list(sceneID, weight):
+    with open(FNAME_SCENE_LIST, "a") as f:
+        f.write(f"\n{sceneID},{weight}")
 
 
 def make_images(experiment, base, perspective, rows):
@@ -117,29 +143,18 @@ def make_images(experiment, base, perspective, rows):
 
         if SAVE_IMAGES:
             save_composite_image(layers, handles, row["SceneID"])
+            append_scene_list(row["SceneID"], row["Häufigkeit"])
 
     for lname in layer_names:
         handles[lname].close()
 
 
-def log_duplicate_layersets(fname):
-    duplicate_layer_sets = [
-        lset for lset in layersets.keys() if len(layersets[lset]) > 1
-    ]
-    if len(duplicate_layer_sets) > 0:
-        print(f"Duplicate layersets: {len(duplicate_layer_sets)}")
-        with open(fname, "w") as f:
-            for lset in duplicate_layer_sets:
-                f.write(f"Layerset: {', '.join(lset)}\n")
-                for scene in layersets[lset]:
-                    f.write(json.dumps(scene, indent=2))
-                f.write("\n\n")
-
-
 def main():
-    # TODO: Generate scene list
-
     experiments = ["MS", "CP", "SE"]
+
+    if SAVE_IMAGES:
+        reset_scene_list()
+        
     for experiment in experiments:
         with open("Szenarienübersicht_{}.csv".format(experiment)) as f:
             csv_reader = csv.DictReader(f, delimiter=",")
