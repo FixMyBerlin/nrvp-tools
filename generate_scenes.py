@@ -117,7 +117,7 @@ def make_images(experiment, base, perspective, rows):
 
 
 def main():
-    experiments = ["SR"]
+    experiments = ["MS", "CP", "SE"]
     for experiment in experiments:
         with open("Szenarienübersicht_{}.csv".format(experiment)) as f:
             csv_reader = csv.DictReader(f, delimiter=",")
