@@ -1,1 +1,1 @@
-aws s3 sync out s3://fmb-aws-bucket/KatasterKI/scenes/
+aws s3 sync out s3://fmb-aws-bucket/KatasterKI/scenes/ --include "*.jpg"
