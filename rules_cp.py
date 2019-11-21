@@ -2,32 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from pprint import pprint
-
-def translate_from_heiko_to_reality(heiko):
-    return {
-        "SR": "CP",
-        "HVS": "MS",
-        "NVS": "SE"
-    }[heiko]
+import utils
  
 def needs_layer(data, lname, experiment):
-    layer_info = lname.split("_", 5)
-    try:
-        layer_experiment  = translate_from_heiko_to_reality(layer_info[0])
-        layer_base  = layer_info[1]
-        layer_perspective  = layer_info[2]
-    except (IndexError, KeyError):
-        layer_experiment  = experiment
-        layer_base  = data["Basisszenario"]
-        layer_perspective  = data["Kamera"]
-
-    if data["Kamera"] != layer_perspective:
-        return False
-
-    if data["Basisszenario"] != layer_base:
-        return False
-
-    if experiment != layer_experiment:
+    if not utils.check_base_data(data, lname, experiment):
         return False
 
     if lname.endswith("Basis.png"):

@@ -15,7 +15,8 @@ from pprint import pprint
 
 IMAGE_SIZE = (1240, 930)
 IGNORE = (".DS_Store", "Icon\r")
-SAVE_IMAGES = False
+SAVE_IMAGES = True
+DEBUG = False
 
 layers_used = set()
 missing_base = set()
@@ -95,14 +96,17 @@ def make_images(experiment, base, perspective, rows):
 
         if i % 25 == 0:
             print("{} / {}: {}".format(i + 1, total, row["SceneID"]))
-        # pprint(row)
-        # print("Layers:")
-        # for lname in sorted(layer_names):
-        #     head = "--> " if needs_layer(row, lname, experiment) else "    "
-        #     print(head, lname)
 
-        # if i >= 110:
-        #     import pdb; pdb.set_trace()
+        if DEBUG:
+            print("{} / {}: {}".format(i + 1, total, row["SceneID"]))
+            pprint(row)
+            print("Layers:")
+            for lname in sorted(layer_names):
+                head = "--> " if needs_layer(row, lname, experiment) else "    "
+                print(head, lname)
+
+            # if row["Basisszenario"] != "1":
+            import pdb; pdb.set_trace()
 
         # if len(layers) == 0:
         #     continue
@@ -136,18 +140,19 @@ def main():
 
         for base in scenes_grouped.keys():
             for perspective in scenes_grouped[base].keys():
-                print(
-                    "\n{}\tSzenen für Experiment {}\tBasisszenario {}\tPerspektive {}".format(
-                        len(scenes_grouped[base][perspective]),
-                        experiment,
-                        base,
-                        perspective,
+                if experiment == "SE":
+                    print(
+                        "\n{}\tSzenen für Experiment {}\tBasisszenario {}\tPerspektive {}".format(
+                            len(scenes_grouped[base][perspective]),
+                            experiment,
+                            base,
+                            perspective,
+                        )
                     )
-                )
 
-                make_images(
-                    experiment, base, perspective, scenes_grouped[base][perspective]
-                )
+                    make_images(
+                        experiment, base, perspective, scenes_grouped[base][perspective]
+                    )
 
     print("All layer ids:")
     pprint(sorted(layer_ids))
