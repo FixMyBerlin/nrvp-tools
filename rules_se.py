@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import utils
- 
+
+
 def needs_layer(data, lname, experiment):
     if not utils.check_base_data(data, lname, experiment):
         return False
@@ -21,7 +22,10 @@ def needs_layer(data, lname, experiment):
         return rv
 
     if "Einbahn-Gegenverkehr" in lname:
-        rv = data["FS-Art"] == "Einbahnstraße-Gegenverkehr" and data["besondere Merkmale"] == "-"
+        rv = (
+            data["FS-Art"] == "Einbahnstraße-Gegenverkehr"
+            and data["besondere Merkmale"] == "-"
+        )
         return rv
 
     if "Einbahn" in lname:
@@ -33,23 +37,38 @@ def needs_layer(data, lname, experiment):
         return rv
 
     if "Fahrrad-Sonderzeichen-Einbahn-Gegenverkehr" in lname:
-        rv = data["FS-Art"] == "Einbahnstraße-Gegenverkehr" and data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung"
+        rv = (
+            data["FS-Art"] == "Einbahnstraße-Gegenverkehr"
+            and data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung"
+        )
         return rv
 
-    if  lname.endswith("Fahrrad-Sonderzeichen-Einbahn.png"):
-        rv = data["FS-Art"] == "Einbahnstraße" and data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung"
+    if lname.endswith("Fahrrad-Sonderzeichen-Einbahn.png"):
+        rv = (
+            data["FS-Art"] == "Einbahnstraße"
+            and data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung"
+        )
         return rv
 
     if "Fahrrad-Sonderzeichen-Ohne-Verkehr" in lname:
-        rv = data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung" and data["Verkehrsaufkommen"] == "autofrei"
+        rv = (
+            data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung"
+            and data["Verkehrsaufkommen"] == "autofrei"
+        )
         return rv
 
     if "Fahrrad-Sonderzeichen-Regulaer" in lname:
-        rv = data["besondere Merkmale"] == 'Fahrradstraße-Sondermarkierung' and data["Verkehrsaufkommen"] == "normal"
+        rv = (
+            data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung"
+            and data["Verkehrsaufkommen"] == "normal"
+        )
         return rv
 
     if "Fahrrad-Sonderzeichen" in lname:
-        rv = data["FS-Art"] == "KFZ" and data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung"
+        rv = (
+            data["FS-Art"] == "KFZ"
+            and data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung"
+        )
         return rv
 
     if "Gegenverkehr" in lname:
@@ -57,23 +76,35 @@ def needs_layer(data, lname, experiment):
         return rv
 
     if "Ohne-Verkehr" in lname:
-        rv = data["Verkehrsaufkommen"] == 'autofrei'
+        rv = data["Verkehrsaufkommen"] == "autofrei"
         return rv
 
     if "RVA-Farbig-Einbahn-Gegenverkehr" in lname:
-        rv = data["besondere Merkmale"] == "Fahrradstraße-Hollandaise" and data["FS-Art"] == "Einbahnstraße-Gegenverkehr"
+        rv = (
+            data["besondere Merkmale"] == "Fahrradstraße-Hollandaise"
+            and data["FS-Art"] == "Einbahnstraße-Gegenverkehr"
+        )
         return rv
 
     if "RVA-Farbig-Einbahn" in lname:
-        rv = data["besondere Merkmale"] == "Fahrradstraße-Hollandaise" and data["FS-Art"] == "Einbahnstraße"
+        rv = (
+            data["besondere Merkmale"] == "Fahrradstraße-Hollandaise"
+            and data["FS-Art"] == "Einbahnstraße"
+        )
         return rv
 
     if "RVA-Farbig-Ohne-Verkehr" in lname:
-        rv = data["besondere Merkmale"] == "Fahrradstraße-Hollandaise" and data["Verkehrsaufkommen"] == "autofrei"
+        rv = (
+            data["besondere Merkmale"] == "Fahrradstraße-Hollandaise"
+            and data["Verkehrsaufkommen"] == "autofrei"
+        )
         return rv
 
     if "RVA-Farbig-Regulaer" in lname:
-        rv = data["besondere Merkmale"] == "Fahrradstraße-Hollandaise"  and data["Verkehrsaufkommen"] == "normal"
+        rv = (
+            data["besondere Merkmale"] == "Fahrradstraße-Hollandaise"
+            and data["Verkehrsaufkommen"] == "normal"
+        )
         return rv
 
     if "Spiel" in lname:
