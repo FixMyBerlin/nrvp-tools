@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
- 
+
 import csv
 import os
 import sys
 import random
-import rules_hvs
-import rules_sr
+import rules_ms
+import rules_cp
+import rules_se
 import json
 from PIL import Image, ImageOps
 from collections import defaultdict
@@ -77,15 +78,19 @@ def make_images(experiment, base, perspective, rows):
             print("Error loading layer", e)
             sys.exit()
 
-    if experiment == "SR":
-        needs_layer = rules_sr.needs_layer
-    elif experiment == "HVS":
-        needs_layer = rules_hvs.needs_layer
-
+    if experiment == "CP":
+        needs_layer = rules_cp.needs_layer
+    elif experiment == "MS":
+        needs_layer = rules_ms.needs_layer
+    elif experiment == "SE":
+        needs_layer = rules_se.needs_layer
+    else:
+        raise Exception(f"Experiment {experiment} not defined")
 
     for i, row in enumerate(rows):
         layers = sorted(
-            [lname for lname in layer_names if needs_layer(row, lname, experiment)], reverse=True
+            [lname for lname in layer_names if needs_layer(row, lname, experiment)],
+            reverse=True,
         )
 
         if i % 25 == 0:
@@ -95,7 +100,7 @@ def make_images(experiment, base, perspective, rows):
         # for lname in sorted(layer_names):
         #     head = "--> " if needs_layer(row, lname, experiment) else "    "
         #     print(head, lname)
-        
+
         # if i >= 110:
         #     import pdb; pdb.set_trace()
 
@@ -117,6 +122,8 @@ def make_images(experiment, base, perspective, rows):
 
 
 def main():
+    # TODO: Generate scene list
+
     experiments = ["MS", "CP", "SE"]
     for experiment in experiments:
         with open("Szenarienübersicht_{}.csv".format(experiment)) as f:
@@ -159,7 +166,9 @@ def main():
                 f.write("\n\n")
 
     print(
-        "Unused:\n- {}".format("\n- ".join([l for l in all_layer_names if l not in layers_used]))
+        "Unused:\n- {}".format(
+            "\n- ".join(sorted([l for l in all_layer_names if l not in layers_used]))
+        )
     )
 
 

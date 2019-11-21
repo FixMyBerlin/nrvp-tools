@@ -2,14 +2,21 @@
 # -*- coding: utf-8 -*-
 
 from pprint import pprint
+
+def translate_from_heiko_to_reality(heiko):
+    return {
+        "SR": "CP",
+        "HVS": "MS",
+        "NVS": "SE"
+    }[heiko]
  
 def needs_layer(data, lname, experiment):
     layer_info = lname.split("_", 5)
     try:
-        layer_experiment  = layer_info[0]
+        layer_experiment  = translate_from_heiko_to_reality(layer_info[0])
         layer_base  = layer_info[1]
         layer_perspective  = layer_info[2]
-    except IndexError:
+    except (IndexError, KeyError):
         layer_experiment  = experiment
         layer_base  = data["Basisszenario"]
         layer_perspective  = data["Kamera"]
