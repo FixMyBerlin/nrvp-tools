@@ -16,7 +16,7 @@ from pprint import pprint
 DEBUG = False
 SAVE_IMAGES = True
 
-FNAME_SCENE_LIST = "KatasterKI_scene_list.csv"
+FNAME_SCENE_LIST = "out/KatasterKI_scene_list.csv"
 IGNORE = (".DS_Store", "Icon\r")
 IMAGE_SIZE = (1240, 930)
 
