@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import utils
+from pprint import pprint
 
 
 def needs_layer(data, lname, experiment):
@@ -77,6 +78,8 @@ def needs_layer(data, lname, experiment):
     # Verkehrsaufkommen
 
     if "Viel-Verkehr" in lname:
+        if data["SceneID"] == "01_MS_C_3":
+            pprint(data)
         return (
             data["FS-Aufkommen"] == "viel"
             and data["FS-Art"] == "Kfz"

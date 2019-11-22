@@ -37,35 +37,35 @@ def needs_layer(data, lname, experiment):
 
     if "Aufpflasterung-Schmal-Hecke" in lname:
         rv = data["Tr_re-Breite"] == "schmal" and data["Tr_re-Art"] == "Aufpflasterung"
-        rv = rv and data["Haeuserfront"] == "Gruenanlage"
+        rv = rv and data["Häuserfront"] == "Grünanlage"
         return rv
 
     # Grünfläche und Grasfläche
 
     if "TrLi-Gruenstreifen-Breit" in lname:
-        rv = data["Tr_li-Breite"] == "breit" and data["Tr_li-Art"] == "Gruenstreifen"
+        rv = data["Tr_li-Breite"] == "breit" and data["Tr_li-Art"] == "Grünstreifen"
         return rv
 
     if "TrLi-Gruenstreifen-Schmal" in lname:
-        rv = data["Tr_li-Breite"] == "schmal" and data["Tr_li-Art"] == "Gruenstreifen"
+        rv = data["Tr_li-Breite"] == "schmal" and data["Tr_li-Art"] == "Grünstreifen"
         return rv
 
     if "TrRe-Gruenstreifen-Breit" in lname:
-        rv = data["Tr_re-Breite"] == "breit" and data["Tr_re-Art"] == "Gruenstreifen"
+        rv = data["Tr_re-Breite"] == "breit" and data["Tr_re-Art"] == "Grünstreifen"
         return rv
 
     if "TrRe-Gruenstreifen-Schmal" in lname:
-        rv = data["Tr_re-Breite"] == "schmal" and data["Tr_re-Art"] == "Gruenstreifen"
+        rv = data["Tr_re-Breite"] == "schmal" and data["Tr_re-Art"] == "Grünstreifen"
         return rv
 
     # Hecke
 
     if "TrLi-Hecke" in lname:
-        rv = data["Links_RVA"] == "Gruenanlage"
+        rv = data["Links_RVA"] == "Grünanlage"
         return rv
 
     if "TrRe-Hecke" in lname:
-        rv = data["Haeuserfront"] == "Gruenanlage"
+        rv = data["Häuserfront"] == "Grünanlage"
         return rv
 
     # Poller
@@ -77,7 +77,7 @@ def needs_layer(data, lname, experiment):
     # Auslage
 
     if "Auslage" in lname:
-        rv = data["GW-Geschaeftsnutzung"] == "ja"
+        rv = data["GW-Geschäftsnutzung"] == "ja"
         return rv
 
     return False
