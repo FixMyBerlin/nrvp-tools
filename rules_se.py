@@ -22,45 +22,25 @@ def needs_layer(data, lname, experiment):
     if "Aufpflasterung-Mitte" in lname:
         rv = data["besondere Merkmale"] == "Fahrradstraße-Hollandaise"
         return rv
-    
-    if "RVA-Farbig-Einbahn-Gegenverkehr" in lname:
-        rv = (
-            data["besondere Merkmale"] == "Fahrradstraße-Hollandaise"
-            and data["FS-Art"] == "Einbahnstraße-Gegenverkehr"
-        )
+        
+    if lname.endswith("Fahrrad-Sonderzeichen.png"):
+        rv = data["besondere Merkmale"] == "Fahrradstraße-Hollandaise"
         return rv
-
-    if "RVA-Farbig-Einbahn" in lname:
-        rv = (
-            data["besondere Merkmale"] == "Fahrradstraße-Hollandaise"
-            and data["FS-Art"] == "Einbahnstraße"
-        )
-        return rv
-
+        
     if "RVA-Farbig-Ohne-Verkehr" in lname:
-        rv = (
-            data["besondere Merkmale"] == "Fahrradstraße-Hollandaise"
-            and data["Verkehrsaufkommen"] == "autofrei"
-        )
-        return rv
-
-    if "RVA-Farbig-Regulaer" in lname:
-        rv = (
-            data["besondere Merkmale"] == "Fahrradstraße-Hollandaise"
-            and data["Verkehrsaufkommen"] == "normal"
-        )
+        rv = data["besondere Merkmale"] == "Fahrradstraße-Hollandaise"
         return rv
     
     # normal
     
-    if "Einbahn-Gegenverkehr" in lname:
+    if lname.endswith("Einbahn-Gegenverkehr.png"):
         rv = (
             data["FS-Art"] == "Einbahnstraße-Gegenverkehr"
             and data["besondere Merkmale"] == "-"
         )
         return rv
         
-    if "Einbahn" in lname:
+    if lname.endswith("Einbahn.png"):
         rv = (
             data["FS-Art"] == "Einbahnstraße"
             and data["besondere Merkmale"] == "-"
@@ -68,33 +48,50 @@ def needs_layer(data, lname, experiment):
         return rv
         
     if lname.endswith("Fahrrad.png"):
-        rv = data["besondere Merkmale"] == "Fahrradstraße"
+        rv = (
+            data["besondere Merkmale"] == "Fahrradstraße"
+            and data["besondere Merkmale"] == "-"
+        )
         return rv
         
-    if "Gegenverkehr" in lname:
+    if lname.endswith("Gegenverkehr.png"):
         rv = (
             data["FS-Art"] == "Einbahnstraße-Gegenverkehr"
             and data["besondere Merkmale"] == "-"
         )
         return rv
-    
+
+  #  if "Ohne-Verkehr" in lname:
+   #     rv = data["Verkehrsaufkommen"] == "autofrei"
+    #    return rv
+        
     if "Spiel" in lname:
         rv = data["besondere Merkmale"] == "Spielstraße"
         return rv
 
     # Fahrradstraße-Sondermarkierung
 
-    if "Fahrrad-Sonderzeichen-Einbahn-Gegenverkehr" in lname:
+    if "Fahrrad-Sonderzeichen-Regulaer" in lname:
         rv = (
-            data["FS-Art"] == "Einbahnstraße-Gegenverkehr"
-            and data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung"
+            data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung"
+            and data["Verkehrsaufkommen"] == "normal"
+            and data["FS-Art"] == "Kfz"
+        )
+        return rv
+        
+    if lname.endswith("Fahrrad-Sonderzeichen-Einbahn.png"):
+        rv = (
+            data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung"
+            and data["Verkehrsaufkommen"] == "normal"
+            and data["FS-Art"] == "Einbahnstraße"
         )
         return rv
 
-    if lname.endswith("Fahrrad-Sonderzeichen-Einbahn.png"):
+    if "Fahrrad-Sonderzeichen-Einbahn-Gegenverkehr" in lname:
         rv = (
-            data["FS-Art"] == "Einbahnstraße"
-            and data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung"
+            data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung"
+            and data["Verkehrsaufkommen"] == "normal"
+            and data["FS-Art"] == "Einbahnstraße-Gegenverkehr"
         )
         return rv
 
@@ -102,20 +99,6 @@ def needs_layer(data, lname, experiment):
         rv = (
             data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung"
             and data["Verkehrsaufkommen"] == "autofrei"
-        )
-        return rv
-
-    if "Fahrrad-Sonderzeichen-Regulaer" in lname:
-        rv = (
-            data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung"
-            and data["Verkehrsaufkommen"] == "normal"
-        )
-        return rv
-
-    if "Fahrrad-Sonderzeichen" in lname:
-        rv = (
-            data["FS-Art"] == "KFZ"
-            and data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung"
         )
         return rv
 

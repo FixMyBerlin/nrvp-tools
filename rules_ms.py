@@ -77,7 +77,10 @@ def needs_layer(data, lname, experiment):
     # Verkehrsaufkommen
 
     if "Viel-Verkehr" in lname:
-        return data["FS-Aufkommen"] == "viel"
+        return (
+            data["FS-Aufkommen"] == "viel"
+            and data["FS-Art"] == "Kfz"
+        )
 
     # Oberfläche
 
@@ -98,7 +101,7 @@ def needs_layer(data, lname, experiment):
 
     if "RVA-Farbig-Tr-Schmal" in lname:
         return data["RVA-Oberfläche"] == "Asphalt-Farbig" and (
-            data["Tr_re-Breite"] == "schmal" or data["Tr_li-Breite"] == "schmal"
+            data["Tr_re-Breite"] != "breit" and data["Tr_li-Breite"] != "breit"
         )
 
     # Radwegsymbol
