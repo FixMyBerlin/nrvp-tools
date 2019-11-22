@@ -63,8 +63,8 @@ def get_layer_names(experiment, base, perspective):
     return basepath, layer_names
 
 
-def log_debug_info(iteration, row, total, layer_names):
-    if iteration % 25 == 0:
+def log_debug_info(iteration, row, total, experiment, layer_names, needs_layer):
+    if iteration % 25 == 0 and DEBUG is False:
         print("{} / {}: {}".format(iteration + 1, total, row["SceneID"]))
     elif DEBUG:
         print("{} / {}: {}".format(iteration + 1, total, row["SceneID"]))
@@ -89,8 +89,15 @@ def log_duplicate_layersets(fname):
         with open(fname, "w") as f:
             for lset in duplicate_layer_sets:
                 f.write(f"Layerset: {', '.join(lset)}\n")
-                for scene in layersets[lset]:
-                    f.write(json.dumps(scene, indent=2))
+                for field in layersets[lset][0].keys():
+                    val = layersets[lset][0][field]
+                    for scene in layersets[lset]:
+                        if scene[field] != val:
+                            f.write(f"{field}:\n{scene[field]} != {val}\n\n")
+                            val = scene[field]
+
+                # for scene in layersets[lset]:
+                #     f.write(json.dumps(scene, indent=2))
                 f.write("\n\n")
 
 
@@ -136,14 +143,14 @@ def make_images(experiment, base, perspective, rows):
             reverse=True,
         )
 
-        log_debug_info(i, row, total, layer_names)
+        log_debug_info(i, row, total, experiment, layer_names, needs_layer)
 
         layers_used.update(layers)
         layersets[frozenset(layers)].append(row)
 
         if SAVE_IMAGES:
             save_composite_image(layers, handles, row["SceneID"])
-            append_scene_list(row["SceneID"], row["Häufigkeit"])
+            append_scene_list(row["SceneID"], row["weight"])
 
     for lname in layer_names:
         handles[lname].close()
