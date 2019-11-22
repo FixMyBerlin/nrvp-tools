@@ -1,4 +1,4 @@
-SR_lD,Basisszenario,Kamera,Links_RVA,Tr_li-Breite,Tr_li-Art,Tr_li_baulTrennung,RVA-Breite,Tr_re-Breite,Tr_re-Art,GW-Breite,GW-Geschaeftsnutzung,Haeuserfront,SceneID,Haeufigkeit
+SR_lD,Basisszenario,Kamera,Links_RVA,Tr_li-Breite,Tr_li-Art,Tr_li_baulTrennung,RVA-Breite,Tr_re-Breite,Tr_re-Art,GW-Breite,GW-Geschaeftsnutzung,Haeuserfront,SceneID,Häufigkeit
 1,01,C,Parken,-,-,-,schmal,-,-,schmal,-,normal,01_CP_C_1,1
 2,01,C,Parken,schmal,Gruenstreifen,-,schmal,-,-,schmal,-,normal,01_CP_C_2,1
 3,01,C,Parken,schmal,Aufpflasterung,-,schmal,-,-,schmal,-,normal,01_CP_C_3,1
