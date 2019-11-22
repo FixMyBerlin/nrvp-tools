@@ -28,7 +28,7 @@ def needs_layer(data, lname, experiment):
     
     if "Basis-Regulaer" in lname:
         rv= (
-            data["FS-Art"] == "Kfz"
+            data["FS-Art"] in ["Kfz", "KFZ"]
             and data["Verkehrsaufkommen"] == "normal"
         )
         return rv
@@ -38,7 +38,7 @@ def needs_layer(data, lname, experiment):
         rv = (
             data["besondere Merkmale"] == "Fahrradstraße-Sondermarkierung"
             and data["Verkehrsaufkommen"] == "normal"
-            and data["FS-Art"] == "Kfz"
+            and data["FS-Art"] in ["Kfz", "KFZ"]
         )
         return rv
         
