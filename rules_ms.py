@@ -89,7 +89,7 @@ def needs_layer(data, lname, experiment):
         return (
             data["RVA-Oberfläche"] == "Asphalt-Farbig"
             and data["Tr_li-Breite"] == "breit"
-            and data["Tr_re-Breite"] == "schmal"
+            and (data["Tr_re-Breite"] == "schmal" or data["Tr_re-Breite"] == "-")
         )
 
     if "RVA-Farbig-TrRe-Breit" in lname:
@@ -102,6 +102,11 @@ def needs_layer(data, lname, experiment):
     if "RVA-Farbig-Tr-Schmal" in lname:
         return data["RVA-Oberfläche"] == "Asphalt-Farbig" and (
             data["Tr_re-Breite"] != "breit" and data["Tr_li-Breite"] != "breit"
+        )
+        
+    if "RVA-Farbig-Tr-Breit" in lname:
+        return data["RVA-Oberfläche"] == "Asphalt-Farbig" and (
+            data["Tr_re-Breite"] == "breit" and data["Tr_li-Breite"] == "breit"
         )
 
     # Radwegsymbol
