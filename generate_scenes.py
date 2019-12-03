@@ -14,11 +14,14 @@ from collections import defaultdict
 from pprint import pprint
 
 DEBUG = False
-SAVE_IMAGES = True
+SAVE_IMAGES = False
 
 FNAME_SCENE_LIST = "out/KatasterKI_scene_list.csv"
 IGNORE = (".DS_Store", "Icon\r")
 IMAGE_SIZE = (1240, 930)
+
+have_images = set()
+have_data = set()
 
 all_layer_names = set()
 layer_ids = set()
@@ -64,10 +67,10 @@ def get_layer_names(experiment, base, perspective):
 
 
 def log_debug_info(iteration, row, total, experiment, layer_names, needs_layer):
-    if iteration % 25 == 0 and DEBUG is False:
-        print("{} / {}: {}".format(iteration + 1, total, row["SceneID"]))
+    if iteration % 25 == 0 and DEBUG is False and SAVE_IMAGES is True:
+        print("\t{} / {}: {}".format(iteration + 1, total, row["SceneID"]))
     elif DEBUG:
-        print("{} / {}: {}".format(iteration + 1, total, row["SceneID"]))
+        print("\t{} / {}: {}".format(iteration + 1, total, row["SceneID"]))
         pprint(row)
         print("Layers:")
         for lname in sorted(layer_names):
@@ -112,6 +115,8 @@ def append_scene_list(sceneID, weight):
 
 
 def make_images(experiment, base, perspective, rows):
+    global have_images
+
     total = len(rows)
     try:
         basepath, layer_names = get_layer_names(experiment, base, perspective)
@@ -152,11 +157,15 @@ def make_images(experiment, base, perspective, rows):
             save_composite_image(layers, handles, row["SceneID"])
             append_scene_list(row["SceneID"], row["weight"])
 
+        have_images.add(row["SceneID"])
+
     for lname in layer_names:
         handles[lname].close()
 
 
 def main():
+    global have_data
+
     experiments = ["MS", "CP", "SE"]
 
     if SAVE_IMAGES:
@@ -170,15 +179,16 @@ def main():
         scenes_grouped = defaultdict(lambda: defaultdict(list))
         for row in rows:
             scenes_grouped[row["Basisszenario"]][row["Kamera"]].append(row)
+            have_data.add(row["SceneID"])
 
         for base in scenes_grouped.keys():
             for perspective in scenes_grouped[base].keys():
                 print(
-                    "\n{}\tSzenen für Experiment {}\tBasisszenario {}\tPerspektive {}".format(
-                        len(scenes_grouped[base][perspective]),
+                    "{}_{}_{}  \t{} Szenen".format(
                         experiment,
                         base,
                         perspective,
+                        len(scenes_grouped[base][perspective])
                     )
                 )
 
@@ -186,16 +196,19 @@ def main():
                     experiment, base, perspective, scenes_grouped[base][perspective]
                 )
 
-    print("All layer ids:")
-    pprint(sorted(layer_ids))
-    print()
-
     log_duplicate_layersets("duplicate_layersets.txt")
 
     print(
-        "Unused:\n- {}".format(
-            "\n- ".join(sorted([l for l in all_layer_names if l not in layers_used]))
+        "\nUnused layer names (without 'raus'):\n- {}\n".format(
+            "\n- ".join(sorted([l for l in all_layer_names if (l not in layers_used and "_raus" not in l)]))
         )
+    )
+
+    print("{} / {} Szenen generiert".format(len(have_images), len(have_data)))
+
+    missing_sids = [sid for sid in have_data if sid not in have_images]
+    print("\nMissing SceneIDs:\n- {}\n".format(
+        "\n- ".join(sorted(missing_sids)))
     )
 
 
